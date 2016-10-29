@@ -1,0 +1,16 @@
+{
+  "name": "express-swagger-rest",
+  "version": "0.1.0",
+  "description": "Boilerplate project for Node REST apps",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "express",
+    "swagger",
+    "REST"
+  ],
+  "author": "Randall Crock <rlcrock@gmail.com>",
+  "license": "MIT"
+}
