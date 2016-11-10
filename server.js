@@ -1,37 +1,36 @@
 'use strict';
 
-const express = require('express');
-const bluebird = require('bluebird');
+const Express = require('express');
+const Bluebird = require('bluebird');
 
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const snr = require('swagger-node-runner');
 const SwaggerUI = require('swagger-tools/middleware/swagger-ui');
 
 // Don't automatically fail unhandled rejections
 // Allows middleware chain to handle it separately
-bluebird.onPossiblyUnhandledRejection(() => {});
+Bluebird.onPossiblyUnhandledRejection(() => {});
 
 const middleware = [
   cors,
   parseBody,
   swagger,
   controllerize,
-  handleErrors
+  handleErrors,
 ];
 
-const app = express();
+const express = new Express();
 
 module.exports = {
-  app,
+  app: express,
   init() {
     return createMW()
-      .then(() => app)
+      .then(() => express)
       .catch(err => {
-        console.error(err);
+        console.error(err); // eslint-disable-line no-console
         throw err;
       });
-  }
+  },
 };
 
 /**
@@ -40,7 +39,7 @@ module.exports = {
  * @return {array} Bound middleware functions
  */
 function createMW() {
-  return bluebird.mapSeries(middleware, mw => mw(app));
+  return Bluebird.mapSeries(middleware, mw => mw(express));
 }
 
 /**
@@ -49,9 +48,7 @@ function createMW() {
  */
 function parseBody(app) {
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+  app.use(bodyParser.urlencoded({ extended: true }));
 }
 
 /**
@@ -67,16 +64,16 @@ function swagger(app) {
     });
 
     // Create swagger-node-runner instance
-    function createSNR() {
-      return new bluebird((res, rej) =>
+  function createSNR() {
+    return new Bluebird((res, rej) =>
         require('swagger-node-runner').create({
           appRoot: '.',
         }, (err, runner) => {
-          if(err) return rej(err);
+          if (err) return rej(err);
           return res(runner);
         })
       )
-    }
+  }
 }
 
 /**
@@ -89,19 +86,19 @@ function controllerize(app) {
   // Middleware to handle promise returns from controllers
   function controllerizer(req, res, next) {
     // returning null from a controller implies a 404
-    if(res.promise === null) {
+    if (res.promise === null) {
       res.status(404).json('Not Found')
     }
 
     // Either nothing was returned, or it wasn't then-able, so pass it up the chain
-    if(res.promise === undefined || !res.promise.then) {
+    if (res.promise === undefined || !res.promise.then) {
       return next();
     }
 
     res.promise
       .then(body => {
         // Something else has started to return to the client
-        if(res.headersSent) return next();
+        if (res.headersSent) return next();
         // Otherwise, send the return value
         res.json(body);
       })
@@ -120,8 +117,8 @@ function handleErrors(app) {
 
   // Middleware to trap uncaught errors and return sensible output to the client
   function handler(err, req, res, next) {
-    let parsedError = {};
-    if(err instanceof Error) {
+    const parsedError = {};
+    if (err instanceof Error) {
       parsedError.message = err.message;
       Error.captureStackTrace(parsedError, Error)
     }
