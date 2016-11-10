@@ -36,10 +36,6 @@ function getSwaggerYamlPath() {
   return `${process.cwd()}/${getRootPath()}api/swagger/swagger.yaml`;
 }
 
-function getDefaultEnvPath() {
-  return `${process.cwd()}/${getRootPath()}.env.example`;
-}
-
 function getCoverSource() {
     // Ignore config - else the .env is re-required and the task will fall back to .env's LOG_LEVEL
   return gulp.src([
@@ -194,7 +190,6 @@ gulp.task('db-executed', 'Lists all migrations that have been executed', () =>
 gulp.task('bump-version', 'Increase the version number of the project', (cb) => {
   const packageJson = require(getPackageJsonPath());
   const swaggerObj = yaml.safeLoad(fs.readFileSync(getSwaggerYamlPath(), { encoding: 'utf-8' }));
-  let envConfig = fs.readFileSync(getDefaultEnvPath(), { encoding: 'utf-8' });
   const oldVersion = packageJson.version;
 
     // --major
@@ -213,25 +208,20 @@ gulp.task('bump-version', 'Increase the version number of the project', (cb) => 
   }
 
   swaggerObj.info.version = packageJson.version;
-  envConfig = envConfig.replace(/TEST_EXPECTED_VERSION=(.*)/m, `TEST_EXPECTED_VERSION=${packageJson.version}`);
 
   console.log(`Bumping package version: ${oldVersion} -> ${packageJson.version}`);
   fs.writeFileSync(getPackageJsonPath(), `${JSON.stringify(packageJson, null, 2)}\n`);
   fs.writeFileSync(getSwaggerYamlPath(), `${yaml.safeDump(swaggerObj, { lineWidth: 120 })}`);
-  fs.writeFileSync(getDefaultEnvPath(), `${envConfig}\n`);
   sequence('sync-deps', cb);
 });
 
 gulp.task('sync-version', 'Sync the version number to what is in package.json', (cb) => {
   const packageJson = require(getPackageJsonPath());
   const swaggerObj = yaml.safeLoad(fs.readFileSync(getSwaggerYamlPath(), { encoding: 'utf-8' }));
-  let envConfig = fs.readFileSync(getDefaultEnvPath(), { encoding: 'utf-8' });
 
   swaggerObj.info.version = packageJson.version;
-  envConfig = envConfig.replace(/TEST_EXPECTED_VERSION=(.*)/m, `TEST_EXPECTED_VERSION=${packageJson.version}`);
 
   console.log(`Syncing package version to ${packageJson.version}`);
   fs.writeFileSync(getSwaggerYamlPath(), `${yaml.safeDump(swaggerObj, { lineWidth: 120 })}`);
-  fs.writeFileSync(getDefaultEnvPath(), `${envConfig}\n`);
   sequence('sync-deps', cb);
 });

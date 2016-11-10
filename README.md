@@ -90,3 +90,5 @@ stays in sync across the various files that use it.
   * By default, it increases the patch number
   * The additional arguments can be used to bump the other pieces of the
     version.
+* `gulp sync-version`: Synchronize the version number from `package.json` to the
+  other files which use it, namely `api/swagger/swagger.yaml`
