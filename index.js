@@ -1,9 +1,11 @@
 'use strict';
 
+const env = require('./config/env');
 const server = require('./server');
+const models = require('./models');
 
-server.init()
+models.waitForInit()
+  .then( () => server.init() )
   .then(app => {
-      // eslint-disable-next-line no-process-env
-    app.listen(process.env.PORT || 10010);
+    app.listen(env.PORT || 10010);
   });
