@@ -17,7 +17,7 @@ npm install
 Once all dependencies are installed, you will need to configure the
 following for your project:
 
-### Envrionment
+### Environment
 1. Set default database configs in `.env.example`
 2. Copy `.env.example` to `.env` and set your local development variables
 
@@ -46,3 +46,8 @@ Development
 While developing your app, feel free to create a git pre-commit hook that runs
 `gulp pre-commit`. This will run the style checker (eslint) and all tests. They
 will all have to pass in order to be able to commit your code.
+
+```shell
+echo "gulp pre-commit" >> .git/hooks/pre-commit
+chmod 755 .git/hooks/pre-commit
+```
