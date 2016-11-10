@@ -1,13 +1,15 @@
-express-swagger-rest
-====================
+express-swagger-template
+========================
 
 This is a boilerplate project for use in creating RESTful web applications based
 on NodeJS using the Express web server and Swagger (OpenAPI) API definitions.
 
+*** DELETE OR MODIFY THIS README WHEN YOU CLONE THIS REPO FOR USE IN AN APP ***
+
 Setup
 -----
 
-NPM is used for all dependency management, and gulp is used for development
+`npm` is used for all dependency management, and gulp is used for development
 automation.
 
 ```shell
@@ -51,3 +53,40 @@ will all have to pass in order to be able to commit your code.
 echo "gulp pre-commit" >> .git/hooks/pre-commit
 chmod 755 .git/hooks/pre-commit
 ```
+
+Sequelize - Database
+--------------------
+
+This project is intended to use [Sequelize](http://docs.sequelizejs.com/) for
+interacting with databases using its Object-Relational Model (ORM). Models
+generally correspond to tables in the database, and migrations are used to
+create tables, or make changes to your database.
+
+There are several gulp tasks which assit in working with your databases:
+
+* `gulp db-up`: Run migrations against the database configured by your env
+* `gulp db-down`: Undo the last migration that was run
+* `gulp db-executed`: List the migrations that have been run
+* `gulp db-pending`: List all migrations that haven't been run yet
+
+Testing
+-------
+
+Tests should be added for your app in the `test/` folder where gulp will search
+for tests when you run any of the `gulp test` tasks. To see all gulp tasks, run
+`gulp help`. Several of the tasks have a `-watch` suffix, which indicates that
+gulp will watch your work area for changes, and will re-run tests when changes
+are detected.
+
+Utilities
+---------
+
+There are also gulp tasks intended for use in maintaining your app. Mostly, they
+are for working with your package versioning to make sure the version number
+stays in sync across the various files that use it.
+
+* `gulp bump-version [ --major | --minor | --patch ]`: Increase the package
+  version in accordance with [semver](http://semver.org/)
+  * By default, it increases the patch number
+  * The additional arguments can be used to bump the other pieces of the
+    version.
