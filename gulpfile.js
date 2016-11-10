@@ -8,6 +8,7 @@ const fs = require('fs');
 const gulp = require('gulp-help')(require('gulp'));
 const eslint = require('gulp-eslint');
 const gmocha = require('gulp-mocha');
+const gulpif = require('gulp-if');
 const istanbul = require('gulp-istanbul');
 const execa = require('execa');
 const yaml = require('js-yaml');
@@ -74,6 +75,11 @@ function getUnitTestSource() {
 
 function getIntegrationTestSource() {
   return gulp.src(['test/setup-chai.js', 'test/integration/**/*.js']);
+}
+
+function isFixed(file) {
+	// Has ESLint fixed the file contents?
+  return file.eslint && file.eslint.fixed;
 }
 
 gulp.task('default', ['help']);
@@ -144,12 +150,14 @@ gulp.task('pre-cover', 'Informs istanbul of source files to cover', () =>
         .pipe(istanbul.hookRequire()) // Force `require` to return covered files
 );
 
-gulp.task('lint', 'Lints all JS files with eslint', () =>
-    getLintSource()
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError())
-);
+gulp.task('lint', 'Lints all JS files with eslint', () => {
+  const fix = !!argv.fix;
+  getLintSource()
+    .pipe(eslint({ fix }))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+    .pipe(gulpif(isFixed, gulp.dest('.')));
+});
 
 gulp.task('lint-watch', 'Watch for files changes, then run lint', () =>
     gulp.watch(getWatchGlobs(), gulpWatchOptions, ['lint'])
