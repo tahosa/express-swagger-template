@@ -6,7 +6,7 @@ const path = require('path');
 const Sequelize = require('sequelize');
 
 const env = require('../config/env');
-const debug = require('debug')('my-app:sequelize');
+const debug = require('debug')('my-app:sequelize'); // Change this to your debug string
 
 module.exports = loadModels(__dirname, '');
 
